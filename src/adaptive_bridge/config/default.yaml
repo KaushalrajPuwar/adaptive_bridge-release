@@ -1,0 +1,125 @@
+# ── Example configuration: Adaptive Bridge default profile ──────────
+# To use your own topics, copy this file and edit the topics[] list.
+# Run with: ros2 launch adaptive_bridge adaptive_bridge.launch.py config_path:=./my_config.yaml
+#
+# Each topic entry needs:
+#   id                – unique identifier (any string)
+#   input_topic       – topic the bridge subscribes to
+#   critical_output   – topic the bridge publishes for critical subscribers
+#   noncritical_output – topic the bridge publishes for noncritical subscribers
+#   message_type      – ROS 2 message type ("sensor_msgs/LaserScan", etc.)
+#   qos_overrides     – optional per-topic QoS profile overrides
+
+topics:
+  - id: "scan_main"
+    input_topic: "/scan"
+    critical_output: "/adaptive_bridge/critical/scan"
+    noncritical_output: "/adaptive_bridge/noncritical/scan"
+    message_type: "sensor_msgs/LaserScan"
+    qos_overrides: {}
+
+qos_profiles:
+  reliable_depth10:
+    reliability: RELIABLE
+    history: KEEP_LAST
+    depth: 10
+    durability: VOLATILE
+  besteffort_depth5_lifespan500ms:
+    reliability: BEST_EFFORT
+    history: KEEP_LAST
+    depth: 5
+    durability: VOLATILE
+    lifespan_ms: 500
+  besteffort_depth5:
+    reliability: BEST_EFFORT
+    history: KEEP_LAST
+    depth: 5
+    durability: VOLATILE
+
+topic_qos_profiles:
+  scan_main:
+    critical: "reliable_depth10"
+    noncritical: "besteffort_depth5_lifespan500ms"
+
+classifier:
+  enabled: true
+  subscriber_id: ""
+  evaluate_rate_hz: 2.0
+  demote_loss_threshold: 0.04
+  promote_loss_threshold: 0.02
+  demote_rtt_ms: 80.0
+  promote_rtt_ms: 40.0
+  hysteresis_count: 3
+  allow_unknown_state: true
+
+probes:
+  enabled: true
+  rate_hz: 5.0
+  rtt_threshold_ms: 100.0
+  loss_threshold: 0.05
+  jitter_threshold_ms: 25.0
+  window_size: 50
+  hysteresis_count: 3
+  timeout_ms: 500
+  request_topic: "/adaptive_bridge/probe_req"
+  response_topic: "/adaptive_bridge/probe_resp"
+
+routing_policy:
+  critical_always_forward: true
+  noncritical_enabled: true
+  noncritical_max_rate_hz: 10.0
+  noncritical_drop_policy: "drop_oldest"
+  stale_threshold_ms: 500
+  modes:
+    normal:
+      noncritical_max_rate_hz: 10.0
+      noncritical_depth: 5
+      noncritical_drop_policy: "drop_oldest"
+      stale_threshold_ms: 500
+      max_noncritical_queue: 50
+    degraded:
+      noncritical_max_rate_hz: 3.0
+      noncritical_depth: 2
+      noncritical_drop_policy: "drop_stale"
+      stale_threshold_ms: 250
+      max_noncritical_queue: 20
+    disabled:
+      noncritical_max_rate_hz: 0.0
+      noncritical_depth: 0
+      noncritical_drop_policy: "drop_oldest"
+      stale_threshold_ms: 0
+      max_noncritical_queue: 0
+    emergency:
+      noncritical_max_rate_hz: 0.0
+      noncritical_depth: 0
+      noncritical_drop_policy: "drop_oldest"
+      stale_threshold_ms: 0
+      max_noncritical_queue: 0
+    failure:
+      noncritical_max_rate_hz: 0.0
+      noncritical_depth: 0
+      noncritical_drop_policy: "drop_oldest"
+      stale_threshold_ms: 0
+      max_noncritical_queue: 0
+
+safety:
+  preserve_critical_path: true
+  allow_noncritical_degrade: true
+  max_noncritical_queue: 50
+  overload_drop_noncritical_first: true
+
+security:
+  trust_mode: "default_deny"
+  allow_legacy_node_name_overrides: true
+  enable_probe_hmac: false
+  max_probe_rate_hz: 20.0
+  hmac_secret: ""
+  replay_window_ms: 30000
+
+diagnostics:
+  enabled: true
+  publish_interval_s: 1.0
+  topic: "/adaptive_bridge/diagnostics"
+  verbosity: "info"
+
+overrides: {}
