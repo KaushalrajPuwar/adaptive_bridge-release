@@ -1,0 +1,13 @@
+Source: ros-jazzy-adaptive-bridge
+Section: misc
+Priority: optional
+Maintainer: "Kaushalraj Puwar" <kaushalrajpuwar@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), python3-pytest <!nocheck>, ros-jazzy-ament-lint-auto <!nocheck>, ros-jazzy-ament-lint-common <!nocheck>, ros-jazzy-rclpy, ros-jazzy-sensor-msgs, ros-jazzy-std-msgs, ros-jazzy-ros-workspace, python3-all, python3-setuptools, dh-python
+Homepage: https://index.ros.org/p/adaptive_bridge/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-adaptive-bridge
+Architecture: any
+Depends: ${python3:Depends}, ${misc:Depends}, python3-yaml, ros-jazzy-rclpy, ros-jazzy-sensor-msgs, ros-jazzy-std-msgs, ros-jazzy-ros-workspace
+Description: Adaptive Bridge is a ROS 2 middleware-level proxy that mitigates the slow-subscriber backpressure coupling problem by decoupling critical and non-critical subscriber paths.
+ It prevents a degraded subscriber (e.g. a remote visualisation tool over WiFi) from degrading the publisher or affecting safety-critical consumers.
